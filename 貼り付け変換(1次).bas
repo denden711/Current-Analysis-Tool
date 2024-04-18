@@ -59,7 +59,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("A34").Value = "I_d_max"
                 .Range("B34").Formula = "=MAX(N:N)"
                 .Range("A36").Value = "R"
-                .Range("B36").Value = 1000
+                .Range("B36").Value = 5100
                 .Range("O1").Value = 0
                 .Range("Q1").Formula = "=(1/(2*PI()*T1*R1))*B26"
                 .Range("R1").Formula = "=SQRT(((B27^2)*(B26^2))/((B28^2)*(1+(B26^2))))"
