@@ -6,8 +6,8 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim xlsxPath As String
     Dim ws As Worksheet
 
-    csvPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=0\解析\元データ\csvtoxlsx\backup\"
-    xlsxPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=0\解析\元データ\csvtoxlsx\backup\xlsx\"
+    csvPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\csv\"
+    xlsxPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\xlsx\"
 
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
@@ -87,4 +87,5 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
         End If
     Next file
 End Sub
+
 
