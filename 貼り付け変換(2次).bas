@@ -116,7 +116,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
                 ' N列に式を自動入力
                 For i = 1 To 10000
-                    .Cells(i, "N").Formula = "=2*PI()*$B$30*$R$1*$B$34*SIN(2*PI()*J" & i & "/$B$29-$B$25+(PI()/2))"
+                    .Cells(i, "N").Formula = "=$B$20*SIN(2*PI()*J" & i & "/$B$29-$B$25+(PI()/2))"
                 Next i
 
                 ' P列に式を自動入力
@@ -136,7 +136,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 
                 ' Z列に式を自動入力
                 For i = 1 To 10000
-                    .Cells(i, "Z").Formula = "=2*PI()*$B$30*$AD$1*$B$34*SIN(2*PI()*V" & i & "/$B$29-$B$27+(PI()/2))"
+                    .Cells(i, "Z").Formula = "=$B$22*SIN(2*PI()*V" & i & "/$B$29-$B$27+(PI()/2))"
                 Next i
 
                 ' AB列に式を自動入力
