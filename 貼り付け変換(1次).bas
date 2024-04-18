@@ -73,7 +73,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 
                 ' N列に式を自動入力
                 For i = 1 To 10000
-                    .Cells(i, "N").Formula = "=2*PI()*$T$1*$R$1*$B$19*SIN(2*PI()*D" & i & "/$S$1-$B$23+(PI()/2))"
+                    .Cells(i, "N").Formula = "=$B$21*SIN(2*PI()*D" & i & "/$S$1-$B$23+(PI()/2))"
                 Next i
                 
                 ' P列に式を自動入力
