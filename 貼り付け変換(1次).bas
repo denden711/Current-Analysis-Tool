@@ -5,11 +5,9 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim csvPath As String
     Dim xlsxPath As String
     Dim ws As Worksheet
-    Dim savePath As String
-    Dim newFolder As String
 
-    csvPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\test"
-    xlsxPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\test"
+    csvPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\csv\"
+    xlsxPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\xlsx\"
 
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
@@ -82,32 +80,16 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             
             Dim col As Variant
             For Each col In expCols
-                ws.Columns(col).NumberFormat = "0.0000000E+00"
+                ws.Columns(col).NumberFormat = "0.00000000E+00"
             Next col
             
             ' AとB列の書式を標準に設定
             ws.Columns("A:B").NumberFormat = "General"
 
-
             ' Excel形式で保存し、ファイルを閉じる
+            Dim savePath As String
             savePath = xlsxPath & Replace(file.Name, ".csv", ".xlsx")
             ActiveWorkbook.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
-            ActiveWorkbook.Close SaveChanges:=False
-            
-            ' 同名のフォルダを作成
-            newFolder = xlsxPath & Replace(file.Name, ".csv", "")
-            If Not fso.FolderExists(newFolder) Then
-                fso.CreateFolder newFolder
-            End If
-            
-            ' .xlsxファイルを新しいフォルダにコピー
-            fso.CopyFile savePath, newFolder & "\"
-            
-            ' .xlsxファイルを開いて.csvに変換して保存
-            Workbooks.Open Filename:=savePath
-            Dim csvSavePath As String
-            csvSavePath = newFolder & "\" & Replace(file.Name, ".csv", ".csv")
-            ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
             ActiveWorkbook.Close SaveChanges:=False
         End If
     Next file
