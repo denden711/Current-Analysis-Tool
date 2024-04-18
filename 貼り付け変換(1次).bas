@@ -3,11 +3,21 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim folder As Object
     Dim file As Object
     Dim csvPath As String
-    Dim xlsxPath As String
+    Dim newFolder As Object
     Dim ws As Worksheet
+    Dim fd As FileDialog
 
-    csvPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\csv\"
-    xlsxPath = "C:\Users\User\OneDrive - Chiba Institute of Technology\研究室\研究活動\202402\ワイヤー\y=4\解析\xlsx\"
+    ' フォルダ選択ダイアログを表示
+    Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+    With fd
+        .Title = "CSVファイルが格納されているフォルダを選択してください"
+        If .Show = -1 Then ' ユーザーがOKをクリック
+            csvPath = .SelectedItems(1) & "\"
+        Else
+            MsgBox "フォルダが選択されませんでした。"
+            Exit Sub
+        End If
+    End With
 
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
@@ -44,11 +54,14 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("B32").Formula = "=B21-B31"
                 .Range("A34").Value = "I_d_max"
                 .Range("B34").Formula = "=MAX(N:N)"
+                .Range("A36").Value = "R"
+                .Range("B36").Value = 1000
                 .Range("O1").Value = 0
                 .Range("Q1").Formula = "=(1/(2*PI()*T1*R1))*B26"
                 .Range("R1").Formula = "=SQRT(((B27^2)*(B26^2))/((B28^2)*(1+(B26^2))))"
                 .Range("S1").Formula = "=B25"
                 .Range("T1").Formula = "=1/S1"
+
                 ' M列に式を自動入力
                 For i = 1 To 10000
                     .Cells(i, "M").Formula = "=$B$21*SIN(2*PI()*J" & i & "/$S$1-$B$24)"
@@ -71,7 +84,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
                 ' L列にK列の値を1000で割った結果を入力
                 For i = 1 To 10000
-                    .Cells(i, "L").Formula = "=K" & i & "/1000"
+                    .Cells(i, "L").Formula = "=K" & i & "/$B$36"
                 Next i
             End With
             ' 指定列の書式を指数表示の8桁に設定
@@ -86,11 +99,25 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             ' AとB列の書式を標準に設定
             ws.Columns("A:B").NumberFormat = "General"
 
-            ' Excel形式で保存し、ファイルを閉じる
+            ' 新しいフォルダの作成
+            Dim folderName As String
+            folderName = csvPath & Replace(file.Name, ".csv", "")
+            If Not fso.FolderExists(folderName) Then
+                Set newFolder = fso.CreateFolder(folderName)
+            End If
+
+            ' .xlsxファイルを新しいフォルダに保存
             Dim savePath As String
-            savePath = xlsxPath & Replace(file.Name, ".csv", ".xlsx")
+            savePath = folderName & "\" & Replace(file.Name, ".csv", ".xlsx")
             ActiveWorkbook.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
+            
+            ' 再変換した.csvファイルを同じフォルダに保存
+            Dim csvSavePath As String
+            csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
+            ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
+            
             ActiveWorkbook.Close SaveChanges:=False
         End If
     Next file
 End Sub
+
