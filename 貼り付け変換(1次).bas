@@ -1,4 +1,5 @@
 Sub ConvertCSVsAndInsertDataFormulasWithFSO()
+    On Error GoTo ErrorHandler
     Dim fso As Object
     Dim folder As Object
     Dim file As Object
@@ -11,7 +12,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
     With fd
         .Title = "CSVファイルが格納されているフォルダを選択してください"
-        If .Show = -1 Then ' ユーザーがOKをクリック
+        If .Show = -1 Then
             csvPath = .SelectedItems(1) & "\"
         Else
             MsgBox "フォルダが選択されませんでした。"
@@ -21,6 +22,9 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
+
+    Dim filesProcessed As Integer
+    filesProcessed = 0
 
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
@@ -117,6 +121,18 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
             
             ActiveWorkbook.Close SaveChanges:=False
+            filesProcessed = filesProcessed + 1
         End If
     Next file
+
+    If filesProcessed > 0 Then
+        MsgBox filesProcessed & " 個のファイルを処理しました。", vbInformation
+    Else
+        MsgBox "処理するCSVファイルが見つかりませんでした。", vbExclamation
+    End If
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
 End Sub
