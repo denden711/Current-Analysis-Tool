@@ -98,19 +98,65 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                     .Cells(i, "P").Formula = "=L" & i & "-N" & i
                 Next i
 
-                ' F列に式を自動入力（先ほどの要件から）
+                ' F列に式を自動入力
                 For i = 1 To 10000
                     .Cells(i, "F").Formula = "=$B$19*SIN(2*PI()*D" & i & "/$S$1-B$23)"
                 Next i
 
-                ' L列にK列の値を1000で割った結果を入力
+                ' L列に式を自動入力
                 For i = 1 To 10000
-                    .Cells(i, "L").Formula = "=K" & i & "/$B$36"
+                    .Cells(i, "L").Formula = "=K" & i & "/$B$40"
                 Next i
+
+                ' V列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "V").Formula = "=$B$31+E" & i & ""
+                Next i
+
+                ' W列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "W").Formula = "=$B$31+F" & i & ""
+                Next i
+
+                ' Y列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "Y").Formula = "=$B$38+J" & i & ""
+                Next i
+
+                ' Z列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "Z").Formula = "=$B$38+K" & i & ""
+                Next i
+
+                ' AA列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AA").Formula = "=$B$38+L" & i & ""
+                Next i
+
+                ' AB列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AB").Formula = "=$B$38+M" & i & ""
+                Next i
+
+                ' AC列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AC").Formula = "=$B$38+N" & i & ""
+                Next i
+
+                ' AD列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AD").Formula = "=$B$38+O" & i & ""
+                Next i
+
+                ' AE列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AE").Formula = "=$B$38+P" & i & ""
+                Next i
+
             End With
             ' 指定列の書式を指数表示の8桁に設定
             Dim expCols As Variant
-            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T")
+            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Z", "AA", "AB", "AC", "AD", "AE")
             
             Dim col As Variant
             For Each col In expCols
