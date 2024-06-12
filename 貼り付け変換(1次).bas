@@ -6,6 +6,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim csvPath As String
     Dim newFolder As Object
     Dim ws As Worksheet
+    Dim wb As Workbook
     Dim fd As FileDialog
     Dim logFile As Object
     Dim logFilePath As String
@@ -36,8 +37,9 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
             ' CSVファイルを開く
-            Workbooks.Open Filename:=csvPath & file.Name
-            Set ws = ActiveWorkbook.Sheets(1)
+            Set wb = Workbooks.Open(Filename:=csvPath & file.Name)
+            Set ws = wb.Sheets(1)
+            
             ' 指定されたセルにデータと式を挿入
             With ws
                 .Range("A19").Value = "V_max"
@@ -82,6 +84,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("R1").Formula = "=SQRT(((B27^2)*(B26^2))/((B28^2)*(1+(B26^2))))"
                 .Range("S1").Formula = "=B25"
                 .Range("T1").Formula = "=1/S1"
+                .Range("AD1").Value = 0
 
                 ' M列に式を自動入力
                 For i = 1 To 10000
@@ -143,20 +146,16 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                     .Cells(i, "AC").Formula = "=$B$38+N" & i & ""
                 Next i
 
-                ' AD列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AD").Formula = "=$B$38+O" & i & ""
-                Next i
-
                 ' AE列に式を自動入力
                 For i = 1 To 10000
                     .Cells(i, "AE").Formula = "=$B$38+P" & i & ""
                 Next i
 
             End With
+
             ' 指定列の書式を指数表示の8桁に設定
             Dim expCols As Variant
-            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Z", "AA", "AB", "AC", "AD", "AE")
+            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "Y", "W", "Z", "AA", "AB", "AC", "AE")
             
             Dim col As Variant
             For Each col In expCols
@@ -176,14 +175,14 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             ' .xlsxファイルを新しいフォルダに保存
             Dim savePath As String
             savePath = folderName & "\" & Replace(file.Name, ".csv", ".xlsx")
-            ActiveWorkbook.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
+            wb.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
             
             ' 再変換した.csvファイルを同じフォルダに保存
             Dim csvSavePath As String
             csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
-            ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
+            wb.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
             
-            ActiveWorkbook.Close SaveChanges:=False
+            wb.Close SaveChanges:=False
             filesProcessed = filesProcessed + 1
             logFile.WriteLine "Processed: " & file.Name
         End If
@@ -207,4 +206,5 @@ ErrorHandler:
         logFile.Close
     End If
     Set logFile = Nothing
+    If Not wb Is Nothing Then wb.Close SaveChanges:=False
 End Sub
