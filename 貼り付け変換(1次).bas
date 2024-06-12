@@ -7,6 +7,9 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim newFolder As Object
     Dim ws As Worksheet
     Dim fd As FileDialog
+    Dim logFile As Object
+    Dim logFilePath As String
+    Dim filesProcessed As Integer
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
@@ -23,7 +26,11 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
 
-    Dim filesProcessed As Integer
+    ' ログファイルの設定
+    logFilePath = csvPath & "processing_log.txt"
+    Set logFile = fso.CreateTextFile(logFilePath, True)
+    logFile.WriteLine "CSVファイル処理ログ " & Now
+
     filesProcessed = 0
 
     For Each file In folder.Files
@@ -132,6 +139,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             
             ActiveWorkbook.Close SaveChanges:=False
             filesProcessed = filesProcessed + 1
+            logFile.WriteLine "Processed: " & file.Name
         End If
     Next file
 
@@ -141,8 +149,16 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
         MsgBox "処理するCSVファイルが見つかりませんでした。", vbExclamation
     End If
 
+    logFile.Close
+    Set logFile = Nothing
+
     Exit Sub
 
 ErrorHandler:
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
+    If Not logFile Is Nothing Then
+        logFile.WriteLine "Error: " & Err.Description
+        logFile.Close
+    End If
+    Set logFile = Nothing
 End Sub
