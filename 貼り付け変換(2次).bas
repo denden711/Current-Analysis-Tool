@@ -76,6 +76,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("A56").Value = "Id_2_min"
                 .Range("A57").Value = "(I_d_2_max+I_d_2_min)/2"
                 .Range("A58").Value = "I_d_2_adj"
+                .Range("A60").Value = "freq.[kHz]"
 
                 ' データおよび数式をB列に挿入
                 .Range("B25").Value = 4.5
@@ -106,6 +107,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("B56").Formula = "=MIN(Z:Z)"
                 .Range("B57").Formula = "=(B55+B56)/2"
                 .Range("B58").Formula = "=-B57"
+                .Range("B60").Formula = "=B20/1000"
 
                 ' 追加の数式を設定
                 .Range("O1").Value = 0

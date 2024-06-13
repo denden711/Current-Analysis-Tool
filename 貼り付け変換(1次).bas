@@ -53,7 +53,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("B23").Value = 4.5
                 .Range("A24").Value = "I_phase"
                 .Range("B24").Value = 3.5
-                .Range("A25").Value = "per."
+                .Range("A25").Value = "T"
                 .Range("A26").Value = "tanθ"
                 .Range("B26").Formula = "=TAN(B23-B24)"
                 .Range("A27").Value = "I/V"
