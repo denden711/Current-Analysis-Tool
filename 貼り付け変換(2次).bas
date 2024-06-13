@@ -114,6 +114,8 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("AA1").Value = 0
                 .Range("AC1").Formula = "=(1/(2*PI()*$B$30*$AD$1))*$B$37"
                 .Range("AD1").Formula = "=SQRT((($B$40^2)*($B$37^2))/(($B$42^2)*(1+($B$37^2))))"
+                .Range("AM1").Value = 0
+                .Range("AT1").Value = 0
 
                 ' F列に式を自動入力
                 For i = 1 To 10000
@@ -158,6 +160,66 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 ' AB列に式を自動入力
                 For i = 1 To 10000
                     .Cells(i, "AB").Formula = "=X" & i & "-Z" & i
+                Next i
+
+                ' AF列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AF").Formula = "=$B$45+E" & i & ""
+                Next i
+
+                ' AG列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AG").Formula = "=$B$45+F" & i & ""
+                Next i
+
+                ' AI列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AI").Formula = "=$B$54+K" & i & ""
+                Next i
+
+                ' AJ列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AJ").Formula = "=$B$54+L" & i & ""
+                Next i
+
+                ' AK列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AK").Formula = "=$B$54+M" & i & ""
+                Next i
+
+                ' AL列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AL").Formula = "=$B$54+N" & i & ""
+                Next i
+
+                ' AN列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AN").Formula = "=$B$54+P" & i & ""
+                Next i
+
+                ' AP列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AP").Formula = "=$B$58+W" & i & ""
+                Next i
+
+                ' AQ列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AQ").Formula = "=$B$58+X" & i & ""
+                Next i
+
+                ' AR列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AR").Formula = "=$B$58+Y" & i & ""
+                Next i
+
+                ' AS列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AS").Formula = "=$B$58+Z" & i & ""
+                Next i
+
+                ' AS列に式を自動入力
+                For i = 1 To 10000
+                    .Cells(i, "AU").Formula = "=$B$58+AB" & i & ""
                 Next i
 
             End With
