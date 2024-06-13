@@ -20,12 +20,14 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
         End If
     End With
 
+    ' ファイルシステムオブジェクトを作成
     Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
 
     Dim filesProcessed As Integer
     filesProcessed = 0
 
+    ' フォルダ内の各ファイルを処理
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
             ' CSVファイルを開く
@@ -40,6 +42,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
             ' 指定されたセルにデータと式を挿入
             With ws
+                ' データラベルをA列に挿入
                 .Range("A20").Value = "I_1_max"
                 .Range("A21").Value = "I_1_min"
                 .Range("A22").Value = "I_2_max"
@@ -74,6 +77,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("A57").Value = "(I_d_2_max+I_d_2_min)/2"
                 .Range("A58").Value = "I_d_2_adj"
 
+                ' データおよび数式をB列に挿入
                 .Range("B25").Value = 4.5
                 .Range("B26").Value = 3.5
                 .Range("B27").Formula = "=B25"
@@ -100,13 +104,13 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 .Range("B54").Formula = "=-B53"
                 .Range("B55").Formula = "=MAX(Z:Z)"
                 .Range("B56").Formula = "=MIN(Z:Z)"
-                .Range("B57").Formula = "=(B52+B53)/2"
+                .Range("B57").Formula = "=(B55+B56)/2"
                 .Range("B58").Formula = "=-B57"
 
+                ' 追加の数式を設定
                 .Range("O1").Value = 0
                 .Range("Q1").Formula = "=(1/(2*PI()*$B$30*$R$1))*$B$36"
                 .Range("R1").Formula = "=SQRT((($B$39^2)*($B$36^2))/(($B$42^2)*(1+($B$36^2))))"
-
                 .Range("AA1").Value = 0
                 .Range("AC1").Formula = "=(1/(2*PI()*$B$30*$AD$1))*$B$37"
                 .Range("AD1").Formula = "=SQRT((($B$40^2)*($B$37^2))/(($B$42^2)*(1+($B$37^2))))"
@@ -157,6 +161,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                 Next i
 
             End With
+
             ' 指定列の書式を指数表示の8桁に設定
             Dim expCols As Variant
             expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD")
@@ -186,11 +191,13 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
             ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
             
+            ' ファイルを閉じる
             ActiveWorkbook.Close SaveChanges:=False
             filesProcessed = filesProcessed + 1
         End If
     Next file
 
+    ' 処理結果のメッセージを表示
     If filesProcessed > 0 Then
         MsgBox filesProcessed & " 個のファイルを処理しました。", vbInformation
     Else
