@@ -37,7 +37,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
             ' "L"列の右側に6列を挿入する
             Dim j As Integer
             For j = 1 To 6
-                Columns("M:M").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+                ws.Columns("M:M").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
             Next j
 
             ' 指定されたセルにデータと式を挿入
@@ -217,7 +217,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
                     .Cells(i, "AS").Formula = "=$B$58+Z" & i & ""
                 Next i
 
-                ' AS列に式を自動入力
+                ' AU列に式を自動入力
                 For i = 1 To 10000
                     .Cells(i, "AU").Formula = "=$B$58+AB" & i & ""
                 Next i
@@ -226,7 +226,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
             ' 指定列の書式を指数表示の8桁に設定
             Dim expCols As Variant
-            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD")
+            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AF", "AG", "AI", "AJ", "AK", "AL", "AN", "AP", "AQ", "AR", "AS", "AU")
             
             Dim col As Variant
             For Each col In expCols
