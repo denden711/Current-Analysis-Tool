@@ -11,6 +11,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim logFile As Object
     Dim logFilePath As String
     Dim filesProcessed As Integer
+    Dim i As Long
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
