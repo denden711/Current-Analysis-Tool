@@ -171,7 +171,7 @@ End Sub
 ' 指定列の書式を指数表示の8桁に設定するサブルーチン
 Sub SetColumnNumberFormat(ws As Worksheet)
     Dim expCols As Variant
-    expCols = Array("A", "B", "D", "E", "F", "J", "K", "L", "M", "N", "O", "S", "T", "U", "V", "W", "X", "Z", "AA", "AB", "AD", "AE", "AF", "AG", "AI", "AJ", "AK", "AL")
+    expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "S", "T", "U", "V", "W", "X", "Z", "AA", "AB", "AD", "AE", "AF", "AG", "AI", "AJ", "AK", "AL")
 
     Dim col As Variant
     For Each col In expCols
