@@ -11,7 +11,8 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
 
     ' ログファイルの初期化
     Set fso = CreateObject("Scripting.FileSystemObject")
-    Set logFile = fso.CreateTextFile("processing_log.txt", True)
+    ' スクリプトが実行されるディレクトリにログファイルを作成
+    Set logFile = fso.CreateTextFile(fso.GetAbsolutePathName(".") & "\processing_log.txt", True)
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
@@ -43,8 +44,10 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     ' 処理結果のメッセージを表示
     If filesProcessed > 0 Then
         MsgBox filesProcessed & " 個のファイルを処理しました。", vbInformation
+        WriteLog logFile, filesProcessed & " 個のファイルを処理しました。"
     Else
         MsgBox "処理するCSVファイルが見つかりませんでした。", vbExclamation
+        WriteLog logFile, "処理するCSVファイルが見つかりませんでした。"
     End If
 
     ' ログファイルを閉じる
@@ -75,6 +78,9 @@ Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFile As 
 
     ' 各列に数式を範囲指定で挿入
     InsertFormulas ws
+
+    ' 指定列の書式を指数表示の8桁に設定
+    SetColumnNumberFormat ws
 
     ' 新しいフォルダの作成と保存
     SaveWorkbook ws, csvPath, file, fso, logFile
@@ -177,6 +183,17 @@ Sub InsertFormulas(ws As Worksheet)
     End With
 End Sub
 
+' 指定列の書式を指数表示の8桁に設定するサブルーチン
+Sub SetColumnNumberFormat(ws As Worksheet)
+    Dim expCols As Variant
+    expCols = Array("A", "B", "D", "E", "F", "J", "K", "L", "M", "N", "O", "S", "T", "U", "V", "W", "X", "Z", "AA", "AB", "AD", "AE", "AF", "AG", "AI", "AJ", "AK", "AL")
+
+    Dim col As Variant
+    For Each col In expCols
+        ws.Columns(col).NumberFormat = "0.00000000E+00"
+    Next col
+End Sub
+
 ' ワークブックを保存するサブルーチン
 Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Object, logFile As Object)
     Dim folderName As String
@@ -184,7 +201,7 @@ Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Obje
     
     ' フォルダが存在しない場合に作成
     If Not fso.FolderExists(folderName) Then
-        fso.CreateFolder (folderName)
+        fso.CreateFolder(folderName)
     End If
 
     ' .xlsxファイルを新しいフォルダに保存
@@ -204,4 +221,3 @@ End Sub
 Sub WriteLog(logFile As Object, message As String)
     logFile.WriteLine Now & " - " & message
 End Sub
-
