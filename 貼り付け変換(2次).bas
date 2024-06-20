@@ -7,6 +7,11 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim newFolder As Object
     Dim ws As Worksheet
     Dim fd As FileDialog
+    Dim logFile As Object
+
+    ' ログファイルの初期化
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set logFile = fso.CreateTextFile("processing_log.txt", True)
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
@@ -20,8 +25,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
         End If
     End With
 
-    ' ファイルシステムオブジェクトを作成
-    Set fso = CreateObject("Scripting.FileSystemObject")
+    ' フォルダを取得
     Set folder = fso.GetFolder(csvPath)
 
     Dim filesProcessed As Integer
@@ -30,233 +34,8 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     ' フォルダ内の各ファイルを処理
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
-            ' CSVファイルを開く
-            Workbooks.Open Filename:=csvPath & file.Name
-            Set ws = ActiveWorkbook.Sheets(1)
-            
-            ' "L"列の右側に6列を挿入する
-            Dim j As Integer
-            For j = 1 To 6
-                ws.Columns("M:M").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
-            Next j
-
-            ' 指定されたセルにデータと式を挿入
-            With ws
-                ' データラベルをA列に挿入
-                .Range("A20").Value = "I_1_max"
-                .Range("A21").Value = "I_1_min"
-                .Range("A22").Value = "I_2_max"
-                .Range("A23").Value = "I_2_min"
-                .Range("A25").Value = "V_1_phase"
-                .Range("A26").Value = "I_1_phase"
-                .Range("A27").Value = "V_2_phase"
-                .Range("A28").Value = "I_2_phase"
-                .Range("A29").Value = "T"
-                .Range("A30").Value = "f"
-                .Range("A31").Value = "R_1"
-                .Range("A32").Value = "R_2"
-                .Range("A34").Value = "V_max"
-                .Range("A35").Value = "V_min"
-                .Range("A36").Value = "tanθ_1"
-                .Range("A37").Value = "tanθ_2"
-                .Range("A39").Value = "I_1/V"
-                .Range("A40").Value = "I_2/V"
-                .Range("A42").Value = "ω"
-                .Range("A44").Value = "(V_max+V_min)/2"
-                .Range("A45").Value = "V_adj"
-                .Range("A46").Value = "(I_1_max+I_1_min)/2"
-                .Range("A47").Value = "I_1_adj"
-                .Range("A48").Value = "(I_2_max+I_2_min)/2"
-                .Range("A49").Value = "I_1_adj"
-                .Range("A51").Value = "Id_1_max"
-                .Range("A52").Value = "Id_1_min"
-                .Range("A53").Value = "(I_d_1_max+I_d_1_min)/2"
-                .Range("A54").Value = "I_d_1_adj"
-                .Range("A55").Value = "Id_2_max"
-                .Range("A56").Value = "Id_2_min"
-                .Range("A57").Value = "(I_d_2_max+I_d_2_min)/2"
-                .Range("A58").Value = "I_d_2_adj"
-                .Range("A60").Value = "freq.[kHz]"
-
-                ' データおよび数式をB列に挿入
-                .Range("B25").Value = 4.5
-                .Range("B26").Value = 3.5
-                .Range("B27").Formula = "=B25"
-                .Range("B28").Value = 3.5
-                .Range("B30").Formula = "=1/B29"
-                .Range("B31").Value = 1000
-                .Range("B32").Value = 1000
-                .Range("B34").Formula = "=MAX(E:E)"
-                .Range("B35").Formula = "=MIN(E:E)"
-                .Range("B36").Formula = "=TAN(B25-B26)"
-                .Range("B37").Formula = "=TAN(B27-B28)"
-                .Range("B39").Formula = "=B20/B34"
-                .Range("B40").Formula = "=B22/B34"
-                .Range("B42").Formula = "=2*PI()*B30"
-                .Range("B44").Formula = "=(B34+B35)/2"
-                .Range("B45").Formula = "=-B44"
-                .Range("B46").Formula = "=(B20+B21)/2"
-                .Range("B47").Formula = "=-B46"
-                .Range("B48").Formula = "=(B22+B23)/2"
-                .Range("B49").Formula = "=-B48"
-                .Range("B51").Formula = "=MAX(N:N)"
-                .Range("B52").Formula = "=MIN(N:N)"
-                .Range("B53").Formula = "=(B51+B52)/2"
-                .Range("B54").Formula = "=-B53"
-                .Range("B55").Formula = "=MAX(Z:Z)"
-                .Range("B56").Formula = "=MIN(Z:Z)"
-                .Range("B57").Formula = "=(B55+B56)/2"
-                .Range("B58").Formula = "=-B57"
-                .Range("B60").Formula = "=B20/1000"
-
-                ' 追加の数式を設定
-                .Range("O1").Value = 0
-                .Range("Q1").Formula = "=(1/(2*PI()*$B$30*$R$1))*$B$36"
-                .Range("R1").Formula = "=SQRT((($B$39^2)*($B$36^2))/(($B$42^2)*(1+($B$36^2))))"
-                .Range("AA1").Value = 0
-                .Range("AC1").Formula = "=(1/(2*PI()*$B$30*$AD$1))*$B$37"
-                .Range("AD1").Formula = "=SQRT((($B$40^2)*($B$37^2))/(($B$42^2)*(1+($B$37^2))))"
-                .Range("AM1").Value = 0
-                .Range("AT1").Value = 0
-
-                ' F列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "F").Formula = "=$B$34*SIN(2*PI()*D" & i & "/$B$29-$B$25)"
-                Next i
-
-                ' L列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "L").Formula = "=K" & i & "/$B$31"
-                Next i
-
-                ' M列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "M").Formula = "=$B$20*SIN(2*PI()*J" & i & "/$B$29-$B$26)"
-                Next i
-
-                ' N列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "N").Formula = "=$B$20*SIN(2*PI()*J" & i & "/$B$29-$B$25+(PI()/2))"
-                Next i
-
-                ' P列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "P").Formula = "=L" & i & "-N" & i
-                Next i
-
-                ' X列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "X").Formula = "=W" & i & "/$B$32"
-                Next i
-
-                ' Y列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "Y").Formula = "=$B$22*SIN(2*PI()*V" & i & "/$B$29-$B$28)"
-                Next i
-                
-                ' Z列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "Z").Formula = "=$B$22*SIN(2*PI()*V" & i & "/$B$29-$B$27+(PI()/2))"
-                Next i
-
-                ' AB列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AB").Formula = "=X" & i & "-Z" & i
-                Next i
-
-                ' AF列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AF").Formula = "=$B$45+E" & i & ""
-                Next i
-
-                ' AG列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AG").Formula = "=$B$45+F" & i & ""
-                Next i
-
-                ' AI列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AI").Formula = "=$B$54+K" & i & ""
-                Next i
-
-                ' AJ列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AJ").Formula = "=$B$54+L" & i & ""
-                Next i
-
-                ' AK列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AK").Formula = "=$B$54+M" & i & ""
-                Next i
-
-                ' AL列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AL").Formula = "=$B$54+N" & i & ""
-                Next i
-
-                ' AN列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AN").Formula = "=$B$54+P" & i & ""
-                Next i
-
-                ' AP列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AP").Formula = "=$B$58+W" & i & ""
-                Next i
-
-                ' AQ列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AQ").Formula = "=$B$58+X" & i & ""
-                Next i
-
-                ' AR列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AR").Formula = "=$B$58+Y" & i & ""
-                Next i
-
-                ' AS列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AS").Formula = "=$B$58+Z" & i & ""
-                Next i
-
-                ' AU列に式を自動入力
-                For i = 1 To 10000
-                    .Cells(i, "AU").Formula = "=$B$58+AB" & i & ""
-                Next i
-
-            End With
-
-            ' 指定列の書式を指数表示の8桁に設定
-            Dim expCols As Variant
-            expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AF", "AG", "AI", "AJ", "AK", "AL", "AN", "AP", "AQ", "AR", "AS", "AU")
-            
-            Dim col As Variant
-            For Each col In expCols
-                ws.Columns(col).NumberFormat = "0.00000000E+00"
-            Next col
-            
-            ' AとB列の書式を標準に設定
-            ws.Columns("A:B").NumberFormat = "General"
-
-            ' 新しいフォルダの作成
-            Dim folderName As String
-            folderName = csvPath & Replace(file.Name, ".csv", "")
-            If Not fso.FolderExists(folderName) Then
-                Set newFolder = fso.CreateFolder(folderName)
-            End If
-
-            ' .xlsxファイルを新しいフォルダに保存
-            Dim savePath As String
-            savePath = folderName & "\" & Replace(file.Name, ".csv", ".xlsx")
-            ActiveWorkbook.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
-            
-            ' 再変換した.csvファイルを同じフォルダに保存
-            Dim csvSavePath As String
-            csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
-            ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
-            
-            ' ファイルを閉じる
-            ActiveWorkbook.Close SaveChanges:=False
+            WriteLog logFile, "Processing file: " & file.Name
+            ProcessCSVFile csvPath, file, fso, logFile
             filesProcessed = filesProcessed + 1
         End If
     Next file
@@ -268,8 +47,161 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
         MsgBox "処理するCSVファイルが見つかりませんでした。", vbExclamation
     End If
 
+    ' ログファイルを閉じる
+    logFile.Close
+
     Exit Sub
 
 ErrorHandler:
+    WriteLog logFile, "Error: " & Err.Description
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
+    If Not logFile Is Nothing Then logFile.Close
 End Sub
+
+' CSVファイルの処理
+Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFile As Object)
+    On Error GoTo ErrorHandler
+    Dim ws As Worksheet
+
+    ' CSVファイルを開く
+    Workbooks.Open Filename:=csvPath & file.Name
+    Set ws = ActiveWorkbook.Sheets(1)
+    
+    ' "L"列の右側に4列を挿入する
+    InsertColumns ws, 4
+
+    ' データラベルと数式を挿入
+    InsertDataLabelsAndFormulas ws
+
+    ' 各列に数式を範囲指定で挿入
+    InsertFormulas ws
+
+    ' 新しいフォルダの作成と保存
+    SaveWorkbook ws, csvPath, file, fso, logFile
+
+    ' ファイルを閉じる
+    ActiveWorkbook.Close SaveChanges:=False
+
+    WriteLog logFile, "Successfully processed file: " & file.Name
+    Exit Sub
+
+ErrorHandler:
+    WriteLog logFile, "Error processing file: " & file.Name & " - " & Err.Description
+    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
+    If Not ActiveWorkbook Is Nothing Then ActiveWorkbook.Close SaveChanges:=False
+End Sub
+
+' 指定された列の右側に複数列を挿入するサブルーチン
+Sub InsertColumns(ws As Worksheet, numColumns As Integer)
+    Dim j As Integer
+    For j = 1 To numColumns
+        ws.Columns("M:M").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
+    Next j
+End Sub
+
+' データラベルと数式を挿入するサブルーチン
+Sub InsertDataLabelsAndFormulas(ws As Worksheet)
+    With ws
+        ' A列にデータラベルを挿入
+        .Range("A19").Value = "V_amp"
+        .Range("A20").Value = "V_max"
+        .Range("A21").Value = "V_min"
+        .Range("A22").Value = "V_adj"
+        .Range("A24").Value = "I_1_amp"
+        .Range("A25").Value = "I_1_max"
+        .Range("A26").Value = "I_1_min"
+        .Range("A27").Value = "I_1_adj"
+        .Range("A29").Value = "I_2_amp"
+        .Range("A30").Value = "I_2_max"
+        .Range("A31").Value = "I_2_min"
+        .Range("A32").Value = "I_2_adj"
+        .Range("A34").Value = "V_phase"
+        .Range("A35").Value = "I_1_phase"
+        .Range("A36").Value = "I_2_phase"
+        .Range("A38").Value = "T [s]"
+        .Range("A39").Value = "f [Hz]"
+        .Range("A40").Value = "f [kHz]"
+        .Range("A41").Value = "ω"
+        .Range("A42").Value = "R_1 [Ω]"
+        .Range("A43").Value = "R_2 [Ω]"
+        .Range("A45").Value = "tanθ_1"
+        .Range("A46").Value = "tanθ_2"
+
+        ' B列にデータおよび数式を挿入
+        .Range("B20").Formula = "=MAX(E:E)"
+        .Range("B21").Formula = "=MIN(E:E)"
+        .Range("B22").Formula = "=-(B20+B21)/2"
+        .Range("B24").Formula = "=(B25-B26)/2"
+        .Range("B27").Formula = "=-(B25+B26)/2"
+        .Range("B29").Formula = "=(B30-B31)/2"
+        .Range("B32").Formula = "=-(B30+B31)/2"
+        .Range("B34").Value = 4.5
+        .Range("B35").Value = 3.5
+        .Range("B36").Formula = 3.5
+        .Range("B39").Formula = "=1/B38"
+        .Range("B40").Formula = "=B39/1000"
+        .Range("B41").Formula = "=2*PI()*B39"
+        .Range("B42").Value = 1000
+        .Range("B43").Value = 1000
+        .Range("B45").Formula = "=TAN(B34-B35)"
+        .Range("B46").Formula = "=TAN(B34-B36)"
+    End With
+End Sub
+
+' 各列に数式を範囲指定で挿入するサブルーチン
+Sub InsertFormulas(ws As Worksheet)
+    Dim lastRow As Long
+    lastRow = 10000 ' 必要に応じて調整
+
+    With ws
+        .Range("F1:F" & lastRow).Formula = "=$B$19*SIN(2*PI()*D1/$B$38-$B$34)"
+        .Range("L1:L" & lastRow).Formula = "=K1/$B$42"
+        .Range("M1:M" & lastRow).Formula = "=$B$24*SIN(2*PI()*D1/$B$38-$B$35)"
+        .Range("N1:N" & lastRow).Formula = "=$B$24*SIN(2*PI()*D1/$B$38-$B$34+(PI()/2))"
+        .Range("O1:O" & lastRow).Formula = "=L1-N1"
+        .Range("U1:U" & lastRow).Formula = "=T1/$B$43"
+        .Range("V1:V" & lastRow).Formula = "=$B$29*SIN(2*PI()*D1/$B$38-$B$36)"
+        .Range("W1:W" & lastRow).Formula = "=$B$29*SIN(2*PI()*D1/$B$38-$B$34+(PI()/2))"
+        .Range("X1:X" & lastRow).Formula = "=U1-W1"
+        .Range("Z1:Z" & lastRow).Formula = "=D1"
+        .Range("AA1:AA" & lastRow).Formula = "=$B$22+E1"
+        .Range("AB1:AB" & lastRow).Formula = "=F1"
+        .Range("AD1:AD" & lastRow).Formula = "=L1+$B$27"
+        .Range("AE1:AE" & lastRow).Formula = "=M1"
+        .Range("AF1:AF" & lastRow).Formula = "=N1"
+        .Range("AG1:AG" & lastRow).Formula = "=O1+$B$27"
+        .Range("AI1:AI" & lastRow).Formula = "=U1+$B$32"
+        .Range("AJ1:AJ" & lastRow).Formula = "=V1"
+        .Range("AK1:AK" & lastRow).Formula = "=W1"
+        .Range("AL1:AL" & lastRow).Formula = "=X1+$B$32"
+    End With
+End Sub
+
+' ワークブックを保存するサブルーチン
+Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Object, logFile As Object)
+    Dim folderName As String
+    folderName = csvPath & Replace(file.Name, ".csv", "")
+    
+    ' フォルダが存在しない場合に作成
+    If Not fso.FolderExists(folderName) Then
+        fso.CreateFolder (folderName)
+    End If
+
+    ' .xlsxファイルを新しいフォルダに保存
+    Dim savePath As String
+    savePath = folderName & "\" & Replace(file.Name, ".csv", ".xlsx")
+    ActiveWorkbook.SaveAs Filename:=savePath, FileFormat:=xlOpenXMLWorkbook
+
+    ' 再変換した.csvファイルを同じフォルダに保存
+    Dim csvSavePath As String
+    csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
+    ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
+
+    WriteLog logFile, "Saved files to: " & folderName
+End Sub
+
+' ログにメッセージを書き込むサブルーチン
+Sub WriteLog(logFile As Object, message As String)
+    logFile.WriteLine Now & " - " & message
+End Sub
+
