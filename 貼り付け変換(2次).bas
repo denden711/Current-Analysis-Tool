@@ -45,7 +45,7 @@ Sub 貼り付け変換_2次()
     Exit Sub
 
 ErrorHandler:
-    MsgBox "エラーが発生しました (ConvertCSVsAndInsertDataFormulasWithFSO): " & Err.Description, vbCritical
+    MsgBox "エラーが発生しました (貼り付け変換_2次): " & Err.Description, vbCritical
 End Sub
 
 ' CSVファイルの処理
