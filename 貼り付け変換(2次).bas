@@ -4,9 +4,9 @@ Sub 貼り付け変換_2次()
     Dim folder As Object
     Dim file As Object
     Dim csvPath As String
-    Dim newFolder As Object
     Dim ws As Worksheet
     Dim fd As FileDialog
+    Dim logFilePath As String
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
@@ -20,8 +20,13 @@ Sub 貼り付け変換_2次()
         End If
     End With
 
-    ' フォルダを取得
+    ' ログファイルのパスを設定
+    logFilePath = csvPath & "processing_log.txt"
     Set fso = CreateObject("Scripting.FileSystemObject")
+    ' ログファイルを新規作成
+    fso.CreateTextFile logFilePath, True
+
+    ' フォルダを取得
     Set folder = fso.GetFolder(csvPath)
 
     Dim filesProcessed As Integer
@@ -30,7 +35,7 @@ Sub 貼り付け変換_2次()
     ' フォルダ内の各ファイルを処理
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
-            ProcessCSVFile csvPath, file, fso
+            ProcessCSVFile csvPath, file, fso, logFilePath
             filesProcessed = filesProcessed + 1
         End If
     Next file
@@ -49,14 +54,17 @@ ErrorHandler:
 End Sub
 
 ' CSVファイルの処理
-Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object)
+Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFilePath As String)
     On Error GoTo ErrorHandler
     Dim ws As Worksheet
 
     ' CSVファイルを開く
     Workbooks.Open Filename:=csvPath & file.Name
     Set ws = ActiveWorkbook.Sheets(1)
-    
+
+    ' ファイル処理の進行をログに記録
+    WriteToLog logFilePath, "Processing file: " & file.Name
+
     ' "L"列の右側に3列を挿入する
     InsertColumns ws, 3
 
@@ -72,14 +80,28 @@ Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object)
     ' 新しいフォルダの作成と保存
     SaveWorkbook ws, csvPath, file, fso
 
+    ' ファイルの処理が成功したことをログに記録
+    WriteToLog logFilePath, "Successfully processed file: " & file.Name
+
     ' ファイルを閉じる
     ActiveWorkbook.Close SaveChanges:=False
-
     Exit Sub
 
 ErrorHandler:
-    MsgBox "エラーが発生しました (ProcessCSVFile): " & Err.Description, vbCritical
+    ' エラー情報をログに記録
+    WriteToLog logFilePath, "Error processing file: " & file.Name & " - " & Err.Description
+    MsgBox "エラーが発生しました (ProcessCSVFile): " & file.Name & " - " & Err.Description, vbCritical
     If Not ActiveWorkbook Is Nothing Then ActiveWorkbook.Close SaveChanges:=False
+End Sub
+
+' ログファイルに書き込むサブルーチン
+Sub WriteToLog(logFilePath As String, message As String)
+    Dim fso As Object
+    Dim logFile As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set logFile = fso.OpenTextFile(logFilePath, 8, True) ' 8: ForAppending
+    logFile.WriteLine Now & " - " & message
+    logFile.Close
 End Sub
 
 ' 指定された列の右側に複数列を挿入するサブルーチン
