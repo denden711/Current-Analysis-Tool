@@ -7,12 +7,6 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Dim newFolder As Object
     Dim ws As Worksheet
     Dim fd As FileDialog
-    Dim logFile As Object
-
-    ' ログファイルの初期化
-    Set fso = CreateObject("Scripting.FileSystemObject")
-    ' スクリプトが実行されるディレクトリにログファイルを作成
-    Set logFile = fso.CreateTextFile(fso.GetAbsolutePathName(".") & "\processing_log.txt", True)
 
     ' フォルダ選択ダイアログを表示
     Set fd = Application.FileDialog(msoFileDialogFolderPicker)
@@ -27,6 +21,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     End With
 
     ' フォルダを取得
+    Set fso = CreateObject("Scripting.FileSystemObject")
     Set folder = fso.GetFolder(csvPath)
 
     Dim filesProcessed As Integer
@@ -35,8 +30,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     ' フォルダ内の各ファイルを処理
     For Each file In folder.Files
         If Right(file.Name, 4) = ".csv" Then
-            WriteLog logFile, "Processing file: " & file.Name
-            ProcessCSVFile csvPath, file, fso, logFile
+            ProcessCSVFile csvPath, file, fso
             filesProcessed = filesProcessed + 1
         End If
     Next file
@@ -44,25 +38,18 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     ' 処理結果のメッセージを表示
     If filesProcessed > 0 Then
         MsgBox filesProcessed & " 個のファイルを処理しました。", vbInformation
-        WriteLog logFile, filesProcessed & " 個のファイルを処理しました。"
     Else
         MsgBox "処理するCSVファイルが見つかりませんでした。", vbExclamation
-        WriteLog logFile, "処理するCSVファイルが見つかりませんでした。"
     End If
-
-    ' ログファイルを閉じる
-    logFile.Close
 
     Exit Sub
 
 ErrorHandler:
-    WriteLog logFile, "Error: " & Err.Description
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
-    If Not logFile Is Nothing Then logFile.Close
 End Sub
 
 ' CSVファイルの処理
-Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFile As Object)
+Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object)
     On Error GoTo ErrorHandler
     Dim ws As Worksheet
 
@@ -70,8 +57,8 @@ Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFile As 
     Workbooks.Open Filename:=csvPath & file.Name
     Set ws = ActiveWorkbook.Sheets(1)
     
-    ' "L"列の右側に4列を挿入する
-    InsertColumns ws, 4
+    ' "L"列の右側に3列を挿入する
+    InsertColumns ws, 3
 
     ' データラベルと数式を挿入
     InsertDataLabelsAndFormulas ws
@@ -83,16 +70,14 @@ Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object, logFile As 
     SetColumnNumberFormat ws
 
     ' 新しいフォルダの作成と保存
-    SaveWorkbook ws, csvPath, file, fso, logFile
+    SaveWorkbook ws, csvPath, file, fso
 
     ' ファイルを閉じる
     ActiveWorkbook.Close SaveChanges:=False
 
-    WriteLog logFile, "Successfully processed file: " & file.Name
     Exit Sub
 
 ErrorHandler:
-    WriteLog logFile, "Error processing file: " & file.Name & " - " & Err.Description
     MsgBox "エラーが発生しました: " & Err.Description, vbCritical
     If Not ActiveWorkbook Is Nothing Then ActiveWorkbook.Close SaveChanges:=False
 End Sub
@@ -195,7 +180,7 @@ Sub SetColumnNumberFormat(ws As Worksheet)
 End Sub
 
 ' ワークブックを保存するサブルーチン
-Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Object, logFile As Object)
+Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Object)
     Dim folderName As String
     folderName = csvPath & Replace(file.Name, ".csv", "")
     
@@ -213,11 +198,4 @@ Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Obje
     Dim csvSavePath As String
     csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
     ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
-
-    WriteLog logFile, "Saved files to: " & folderName
-End Sub
-
-' ログにメッセージを書き込むサブルーチン
-Sub WriteLog(logFile As Object, message As String)
-    logFile.WriteLine Now & " - " & message
 End Sub
