@@ -123,7 +123,8 @@ Sub InsertDataLabelsAndFormulas(ws As Worksheet)
         .Range("A43").Value = "R_2 [Ω]"
         .Range("A45").Value = "tanθ_1"
         .Range("A46").Value = "tanθ_2"
-        .Range("A48").Value = "I_d_max"
+        .Range("A48").Value = "I_d_1_max"
+        .Range("A49").Value = "I_d_2_max"
 
         ' B列にデータおよび数式を挿入
         .Range("B20").Formula = "=MAX(E:E)"
@@ -144,6 +145,7 @@ Sub InsertDataLabelsAndFormulas(ws As Worksheet)
         .Range("B45").Formula = "=TAN(B34-B35)"
         .Range("B46").Formula = "=TAN(B34-B36)"
         .Range("B48").Formula = "=MAX(N:N)"
+        .Range("B49").Formula = "=MAX(W:W)"
     End With
     Exit Sub
 
