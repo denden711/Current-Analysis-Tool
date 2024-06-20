@@ -1,4 +1,4 @@
-Sub ConvertCSVsAndInsertDataFormulasWithFSO()
+Sub 貼り付け変換_2次()
     On Error GoTo ErrorHandler
     Dim fso As Object
     Dim folder As Object
@@ -45,7 +45,7 @@ Sub ConvertCSVsAndInsertDataFormulasWithFSO()
     Exit Sub
 
 ErrorHandler:
-    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
+    MsgBox "エラーが発生しました (ConvertCSVsAndInsertDataFormulasWithFSO): " & Err.Description, vbCritical
 End Sub
 
 ' CSVファイルの処理
@@ -78,20 +78,26 @@ Sub ProcessCSVFile(csvPath As String, file As Object, fso As Object)
     Exit Sub
 
 ErrorHandler:
-    MsgBox "エラーが発生しました: " & Err.Description, vbCritical
+    MsgBox "エラーが発生しました (ProcessCSVFile): " & Err.Description, vbCritical
     If Not ActiveWorkbook Is Nothing Then ActiveWorkbook.Close SaveChanges:=False
 End Sub
 
 ' 指定された列の右側に複数列を挿入するサブルーチン
 Sub InsertColumns(ws As Worksheet, numColumns As Integer)
+    On Error GoTo ErrorHandler
     Dim j As Integer
     For j = 1 To numColumns
         ws.Columns("M:M").Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
     Next j
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました (InsertColumns): " & Err.Description, vbCritical
 End Sub
 
 ' データラベルと数式を挿入するサブルーチン
 Sub InsertDataLabelsAndFormulas(ws As Worksheet)
+    On Error GoTo ErrorHandler
     With ws
         ' A列にデータラベルを挿入
         .Range("A19").Value = "V_amp"
@@ -117,6 +123,7 @@ Sub InsertDataLabelsAndFormulas(ws As Worksheet)
         .Range("A43").Value = "R_2 [Ω]"
         .Range("A45").Value = "tanθ_1"
         .Range("A46").Value = "tanθ_2"
+        .Range("A48").Value = "I_d_max"
 
         ' B列にデータおよび数式を挿入
         .Range("B20").Formula = "=MAX(E:E)"
@@ -136,11 +143,17 @@ Sub InsertDataLabelsAndFormulas(ws As Worksheet)
         .Range("B43").Value = 1000
         .Range("B45").Formula = "=TAN(B34-B35)"
         .Range("B46").Formula = "=TAN(B34-B36)"
+        .Range("B48").Formula = "=MAX(N:N)"
     End With
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました (InsertDataLabelsAndFormulas): " & Err.Description, vbCritical
 End Sub
 
 ' 各列に数式を範囲指定で挿入するサブルーチン
 Sub InsertFormulas(ws As Worksheet)
+    On Error GoTo ErrorHandler
     Dim lastRow As Long
     lastRow = 10000 ' 必要に応じて調整
 
@@ -166,10 +179,15 @@ Sub InsertFormulas(ws As Worksheet)
         .Range("AK1:AK" & lastRow).Formula = "=W1"
         .Range("AL1:AL" & lastRow).Formula = "=X1+$B$32"
     End With
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました (InsertFormulas): " & Err.Description, vbCritical
 End Sub
 
 ' 指定列の書式を指数表示の8桁に設定するサブルーチン
 Sub SetColumnNumberFormat(ws As Worksheet)
+    On Error GoTo ErrorHandler
     Dim expCols As Variant
     expCols = Array("D", "E", "F", "J", "K", "L", "M", "N", "O", "S", "T", "U", "V", "W", "X", "Z", "AA", "AB", "AD", "AE", "AF", "AG", "AI", "AJ", "AK", "AL")
 
@@ -177,10 +195,15 @@ Sub SetColumnNumberFormat(ws As Worksheet)
     For Each col In expCols
         ws.Columns(col).NumberFormat = "0.00000000E+00"
     Next col
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました (SetColumnNumberFormat): " & Err.Description, vbCritical
 End Sub
 
 ' ワークブックを保存するサブルーチン
 Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Object)
+    On Error GoTo ErrorHandler
     Dim folderName As String
     folderName = csvPath & Replace(file.Name, ".csv", "")
     
@@ -198,4 +221,8 @@ Sub SaveWorkbook(ws As Worksheet, csvPath As String, file As Object, fso As Obje
     Dim csvSavePath As String
     csvSavePath = folderName & "\" & Replace(file.Name, ".csv", "") & ".csv"
     ActiveWorkbook.SaveAs Filename:=csvSavePath, FileFormat:=xlCSV
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "エラーが発生しました (SaveWorkbook): " & Err.Description, vbCritical
 End Sub
